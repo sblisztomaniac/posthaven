@@ -1,0 +1,38 @@
+[
+  {
+    "epic": "Setup & Data Prep",
+    "user_story": "Initialize project folder and add sample JSON files",
+    "body": "- Create folder structure\n- Add `twitter.json`, `substack.json`, and `linkedin_saves.json`\n- Create empty `app.py` to start building",
+    "labels": ["epic:setup", "type:task"]
+  },
+  {
+    "epic": "Load + Normalize Data",
+    "user_story": "Load and normalize post data from all 3 platforms",
+    "body": "- Read data from JSON files\n- Standardize to format: `id`, `platform`, `title`, `summary`, `url`, `tags`, `note`, `saved_at`\n- Combine all into one list for rendering",
+    "labels": ["epic:data", "type:feature"]
+  },
+  {
+    "epic": "Post Display UI",
+    "user_story": "Build Streamlit UI to show saved posts with platform and title",
+    "body": "- Add `st.text_input` for search\n- Loop through posts and show in expandable cards\n- Show platform, title (linked), summary, tags, note",
+    "labels": ["epic:ui", "type:feature"]
+  },
+  {
+    "epic": "Tagging + Notes Editing",
+    "user_story": "Allow users to tag and annotate saved posts",
+    "body": "- Add input for custom tags per post\n- Add editable notes section\n- Store temporary edits in memory",
+    "labels": ["epic:ui", "type:feature"]
+  },
+  {
+    "epic": "Save & Export",
+    "user_story": "Save changes to JSON files and enable export",
+    "body": "- Group posts by platform\n- Overwrite `twitter.json`, `substack.json`, `linkedin_saves.json`\n- (Optional) Add Markdown export of all posts",
+    "labels": ["epic:data", "type:feature"]
+  },
+  {
+    "epic": "Final Testing",
+    "user_story": "Test app flow and ensure tag/note edits persist",
+    "body": "- Check that search and editing work correctly\n- Test saving and reopening JSONs\n- Validate behavior with 10+ posts",
+    "labels": ["epic:test", "type:qa"]
+  }
+]
