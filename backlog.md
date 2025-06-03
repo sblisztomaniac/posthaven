@@ -1,116 +1,153 @@
-Here’s your clean, actionable `backlog.md` file based on the **1-hour MVP sprintplan** for your saved post collector.
+Here’s your complete and **streamlined `backlog.md`** file for the **Dynamic Post Collector MVP**, structured for **90-minute execution**. It breaks down all tasks by epics and user stories with a clear and focused scope — aligned with your real-time API+RSS fetching and local tagging interface.
 
 ---
 
-### 📋 `backlog.md`: Post Collector MVP
+### 📋 `backlog.md`: Dynamic Post Collector MVP (Live Data, Local Notes)
 
-```markdown
-# 🧾 Backlog: Post Collector MVP (1-Hour Local Version)
+````markdown
+# 📋 Backlog: Dynamic Post Collector MVP
 
-This backlog captures all tasks to be executed in a 1-hour sprint to build a personal Streamlit-based app that collects saved posts from Twitter, Substack, and LinkedIn using local JSON files.
+This backlog defines the epics, user stories, and task breakdown for building a local, dynamic app that fetches liked/saved content from X.com, Substack, and LinkedIn — and allows tagging and notes with local persistence.
 
 ---
 
-## 🧠 Epic 1: Setup & Data Prep
+## 🧱 Epic 1: Setup & Configuration
 
 ### 🧩 User Story:
-As a developer, I want a clean project folder and sample data ready so I can start building fast.
+As a developer, I want to quickly set up my environment and config files so I can start fetching data.
 
 #### ✅ Tasks
-- [ ] Create project folder `post_collector/`
-- [ ] Add sample files:
-  - [ ] `twitter.json`
-  - [ ] `substack.json`
-  - [ ] `linkedin_saves.json`
-- [ ] Create `app.py` as the main Streamlit script
+- [ ] Create `post_collector/` project folder
+- [ ] Create `.env` file with:
+  - `X_BEARER_TOKEN`
+  - `X_USER_ID`
+- [ ] Create `feeds.json` with sample Substack RSS URLs
+- [ ] Create `linkedin_saves.json` with mock entries
+- [ ] Install required packages:
+  - `streamlit`, `requests`, `feedparser`, `python-dotenv`
 
 ---
 
-## 🔄 Epic 2: Load + Normalize Data
+## 🔌 Epic 2: Data Fetching & Normalization
 
 ### 🧩 User Story:
-As a user, I want to see all my posts from different platforms in one view, regardless of source.
+As a user, I want to load my liked/saved posts from X, Substack, and LinkedIn into a single list.
 
 #### ✅ Tasks
-- [ ] Load all 3 JSON files into Python
-- [ ] Normalize structure:
-  - `id`, `platform`, `title`, `summary`, `url`, `author`, `tags`, `note`, `saved_at`
-- [ ] Combine all into a single list for rendering
+- [ ] Write `fetch_x_likes()` function
+  - Use `Bearer Token` to fetch liked tweets
+  - Extract `id`, `author`, `text`, `created_at`, `url`
+- [ ] Write `fetch_substack_feeds()` function
+  - Load RSS URLs from `feeds.json`
+  - Parse `title`, `summary`, `link`, `published`
+- [ ] Load `linkedin_saves.json` into memory
+- [ ] Normalize all post objects into this structure:
+
+```python
+{
+  "id": str,
+  "platform": "x" | "substack" | "linkedin",
+  "title": str,
+  "author": str,
+  "url": str,
+  "summary": str,
+  "saved_at": str (YYYY-MM-DD)
+}
+````
 
 ---
 
-## 🖥️ Epic 3: Post Display UI
+## 🖼 Epic 3: UI – View & Annotate Posts
 
 ### 🧩 User Story:
-As a user, I want a clean UI where I can view all posts with their platform, title, and link.
+
+As a user, I want to view all saved posts in a clean UI and add tags or notes for future reference.
 
 #### ✅ Tasks
-- [ ] Add Streamlit UI with search bar
-- [ ] Loop over all posts
-- [ ] Display each post in an `st.expander` or `st.card`-like format:
-  - Title (clickable link)
-  - Platform badge
-  - Summary/preview
-  - Tags display
-  - Note display
+
+* [ ] Display search input (`st.text_input`)
+* [ ] Loop through posts in `st.expander` format
+
+  * Show platform badge
+  * Title (as clickable link)
+  * Author + summary (trimmed)
+  * Saved date
+* [ ] Add `st.text_input` for tag entry
+* [ ] Add `st.text_area` for note entry
 
 ---
 
-## 🏷️ Epic 4: Tagging + Notes Editing
+## 💾 Epic 4: Save & Load Local Notes
 
 ### 🧩 User Story:
-As a user, I want to tag and annotate each post so I can organize my saved content meaningfully.
+
+As a user, I want my tags and notes to be saved so I don’t lose my work after closing the app.
 
 #### ✅ Tasks
-- [ ] For each post, show `st.text_input` or tag input
-- [ ] Let user edit `note` and `tags`
-- [ ] Keep edits in memory
-- [ ] Add "Save All" button
+
+* [ ] Create `local_notes.json` (if not exists)
+* [ ] On app load:
+
+  * Load previous notes/tags by `post_id`
+* [ ] On user edit:
+
+  * Update in-memory `notes_map[post_id]`
+* [ ] Add `💾 Save All` button:
+
+  * On click: write all `post_id`, `tags`, `note`, `last_edited` to `local_notes.json`
 
 ---
 
-## 💾 Epic 5: Save & Export
+## 🔄 Epic 5: Refresh Content (Live Fetch)
 
 ### 🧩 User Story:
-As a user, I want to save my edits and optionally export them for use elsewhere.
+
+As a user, I want to fetch the latest liked posts or articles without restarting the app.
 
 #### ✅ Tasks
-- [ ] Add function to group posts back by platform
-- [ ] Write changes to:
-  - `twitter.json`
-  - `substack.json`
-  - `linkedin_saves.json`
-- [ ] Optional: Add button to export all posts as `.md` or `.json`
+
+* [ ] Add `🔁 Refresh Posts` button
+* [ ] On click:
+
+  * Call `fetch_x_likes()` and `fetch_substack_feeds()`
+  * Reload the dashboard with new posts
 
 ---
 
-## 🧪 Epic 6: Final Testing
+## 🧪 Epic 6: Testing & Error Handling
 
 ### 🧩 User Story:
-As a user, I want to ensure everything runs correctly and that no data is lost.
+
+As a developer, I want the app to handle missing data or errors gracefully.
 
 #### ✅ Tasks
-- [ ] Test UI for 10+ posts
-- [ ] Confirm save button rewrites all 3 files
-- [ ] Validate tag and note persistency
+
+* [ ] Handle X.com API failure (e.g. rate limit)
+* [ ] Catch RSS parse errors (invalid URLs)
+* [ ] Show fallback message if `linkedin_saves.json` is empty
+* [ ] Ensure `local_notes.json` is safely created and updated
 
 ---
 
-## 🛑 Out of Scope (For Now)
+## 🛑 Out of Scope (For MVP)
 
-- Twitter API fetch
-- LinkedIn scraping
-- Multi-user support
-- Auth or login
-- DB integration
+* Multi-user login
+* OAuth-based login
+* GPT summaries
+* Markdown/Notion export
+* Tag suggestion/autocomplete
 
 ---
+
+## 🧠 Stretch Goals (Optional)
+
+* Add tag filters in sidebar
+* Export notes to Markdown
+* Group posts by platform or tag
+
 ```
 
-Would you like this bundled with:
+---
 
-* A starter `app.py` file?
-* JSON templates for each platform?
-* Markdown export function?
-
-Just say the word and I’ll generate it.
+Would you like this backlog converted into GitHub-style issue templates next? I can format each Epic/User Story into JSON for easy uploading to your repo.
+```
