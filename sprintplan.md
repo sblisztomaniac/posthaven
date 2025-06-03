@@ -1,109 +1,113 @@
-### 📦 `sprintplan.md`: Post Collector MVP — 1 Hour Sprint
+### ⚡ `sprintplan.md`: 90-Min Sprint – Dynamic Post Collector MVP
 
 ````markdown
-# 🏃‍♂️ Sprint Plan: Post Collector MVP (1-Hour Build)
+# ⏱️ Sprint Plan: Post Collector MVP (1.5-Hour Build)
 
 ## 🎯 Goal
-Build a local Streamlit app that:
-- Loads saved posts from `twitter.json`, `substack.json`, and `linkedin_saves.json`
-- Displays them in clean cards
-- Lets you add tags and notes
-- Includes basic search by keyword or tag
+
+Build a **local Streamlit app** that:
+- Dynamically fetches liked posts from **X.com** and articles from **Substack RSS**
+- Loads saved posts from **LinkedIn (local JSON)**
+- Displays them in a unified view
+- Lets user **tag + annotate** each post
+- Saves those edits locally
 
 ---
 
-## ⏱️ Total Time: 60 Minutes
+## ⏳ Total Time: 1.5 Hours (Solo Developer)
 
-### ✅ PREP (5 min)
+---
+
+### ✅ Phase 1: Setup & Config (10 min)
+
 - [ ] Create project folder: `post_collector/`
-- [ ] Add `twitter.json`, `substack.json`, `linkedin_saves.json` with sample data
-- [ ] Create `app.py` (main Streamlit app)
+- [ ] Add `.env` for X.com Bearer Token + User ID
+- [ ] Create `feeds.json` with sample Substack RSS URLs
+- [ ] Create `linkedin_saves.json` with 1–2 entries (mock)
+- [ ] Install: `streamlit`, `feedparser`, `requests`, `dotenv`
 
 ---
 
-### 🔍 PHASE 1: Load + Merge Posts (10 min)
-- [ ] Read all 3 JSON files into Python
-- [ ] Normalize each into a common schema (`id`, `platform`, `title`, `summary`, `tags`, `note`, `url`, `saved_at`)
-- [ ] Combine into a single `posts` list
+### 🔌 Phase 2: Live Fetch (25 min)
 
+- [ ] **X.com**: `fetch_x_likes()` using Bearer Token  
+  - Fetch latest 10–20 liked tweets
+- [ ] **Substack**: `fetch_substack_posts()` from RSS URLs  
+  - Use `feedparser` to extract title, summary, link
+- [ ] **LinkedIn**: Load `linkedin_saves.json` as fallback
+
+- [ ] Normalize all into:
 ```python
-import json
-
-def load_posts():
-    with open('twitter.json') as f1, open('substack.json') as f2, open('linkedin_saves.json') as f3:
-        return json.load(f1) + json.load(f2) + json.load(f3)
+{
+  "id", "platform", "title", "author",
+  "url", "summary", "saved_at"
+}
 ````
 
 ---
 
-### 🖼️ PHASE 2: Streamlit UI (25 min)
+### 🖼️ Phase 3: UI Display (25 min)
 
-* [ ] Setup `streamlit run app.py`
-* [ ] Add search bar (`st.text_input`)
-* [ ] Filter posts by keyword in title/summary/note
-* [ ] Display each post in a `st.expander` or `st.card` format
-* [ ] Show:
+* [ ] Use `st.text_input()` for search
+* [ ] Loop through posts, display as `st.expander()`:
 
-  * Title (clickable)
-  * Platform badge
-  * Summary
-  * Tags (display as chips)
-  * Notes (editable input)
+  * Title (clickable), platform badge, summary
+  * Author, saved date
+* [ ] Add `st.text_input()` for tags
+* [ ] Add `st.text_area()` for notes
 
 ---
 
-### 🏷️ PHASE 3: Tag + Note Editing (10 min)
+### 💾 Phase 4: Save Edits (20 min)
 
-* [ ] Add `st.text_input` or `st.tags_input` for each post
-* [ ] Let user add/edit tags and notes
-* [ ] Store edits in memory
-* [ ] Add a "Save All" button to overwrite all 3 JSON files
+* [ ] Load/edit `local_notes.json`
 
-```python
-if st.button("💾 Save All Changes"):
-    # separate by platform and save back
-```
+  * Tags/notes mapped by `post_id`
+* [ ] Update memory on change
+* [ ] Add `Save All Changes` button
+
+  * Writes updated tags/notes to `local_notes.json`
 
 ---
 
-### 🧪 PHASE 4: Test & Export (5 min)
+### 🧪 Phase 5: Testing & Polish (10 min)
 
-* [ ] Test search + editing
-* [ ] Add button to export as Markdown (optional)
+* [ ] Test fetching, editing, saving
+* [ ] Handle errors:
+
+  * If X.com API fails → show Streamlit warning
+  * If RSS fails → skip feed
+* [ ] Confirm `local_notes.json` loads on next run
 
 ---
 
-## ✅ Files
+## ✅ Success =
+
+* Live data from X and Substack shown
+* Editable tags + notes per post
+* Local save works
+* App runs with `streamlit run app.py`
+
+---
+
+## ❌ Skip for Now
+
+* Multi-tag UI (chips, dropdowns)
+* Markdown export
+* LinkedIn automation
+* GPT summaries
+* Platform filter
+
+---
+
+## 🗂 Minimal Folder Layout
 
 ```
 post_collector/
 ├── app.py
-├── twitter.json
-├── substack.json
+├── .env
+├── feeds.json
 ├── linkedin_saves.json
-└── README.md
+├── local_notes.json
 ```
 
----
-
-## 🚫 Out of Scope
-
-* No DB, login, or persistent tagging history
-* No automatic API fetching (use pre-fetched JSONs for now)
-* No rich text editing
-
----
-
-## 🏁 Done =
-
-* Load posts from all 3 sources
-* View, search, and tag them
-* Edit notes
-* Save changes locally
-
-```
-
----
-
-Want me to generate a working `app.py` starter file based on this plan? I can give you the whole folder setup in one go.
-```
