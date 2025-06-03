@@ -1,105 +1,181 @@
-# 📄 PRD: PostHaven MVP (Personal Collector for X, Substack, LinkedIn)
-
-## 🎯 Objective
-Create a lightweight tool that collects your liked or saved posts from:
-- 🐦 X (Twitter likes via API)
-- 📬 Substack (via RSS)
-- 💼 LinkedIn (manual input or extension)
-
-Let you **organize**, **tag**, **annotate**, and **search** across them in one place — without login or user accounts.
+Here is the detailed and updated `PRD.md` for your **Dynamic Post Collector MVP** — now clearly referencing **X.com (formerly Twitter)**, Substack, and LinkedIn.
 
 ---
 
-## 👤 Assumptions
-- Single-user only (you)
-- API keys, RSS links, or manual inputs are added in config
-- No authentication or signup
-- Runs as local app (Streamlit or simple Flask/React combo)
+### 📄 `PRD.md`: Dynamic Post Collector MVP (X.com + Substack + LinkedIn)
 
 ---
 
-## 🧠 Core Features
+## 🧭 Objective
 
-| Feature         | Description |
-|-----------------|-------------|
-| 🐦 Twitter Likes | Use Bearer Token to fetch your last 100 liked tweets |
-| 📬 Substack Feed | Parse a list of your favorite Substack RSS feeds |
-| 💼 LinkedIn Saved | Import LinkedIn saved post links via CSV, copy-paste, or local browser extension |
-| 🏷️ Tagging        | Add tags to any post manually |
-| 📝 Notes          | Add a short annotation or reason for saving |
-| 🔍 Search         | Search by keyword or tag |
-| 📤 Export         | Optional: export as Markdown or JSON |
+Build a single-user dashboard that dynamically fetches and organizes **saved or liked content** from:
 
----
+* 🐦 **X.com** (liked posts via API)
+* 📬 **Substack** (via RSS feeds)
+* 💼 **LinkedIn** (manually imported JSON)
 
-## 🛠️ Tech Stack
+It should allow the user to:
 
-| Layer    | Tool / Framework |
-|----------|------------------|
-| Frontend | Streamlit (preferred for speed) |
-| Backend  | Python script (FastAPI optional) |
-| Storage  | Local JSON or SQLite DB |
-| Twitter  | Twitter API v2 with bearer token |
-| Substack | RSS feeds via `feedparser` |
-| LinkedIn | CSV/JSON + manual scraping or extension (local only) |
+* View saved posts from all platforms in one place
+* Tag, annotate, and search through them
+* Persist user-created tags and notes locally
 
 ---
 
-## 📦 Components
+## 🎯 Key Features
 
-### 1. Twitter Likes Fetcher
-- Hardcoded bearer token
-- Hit `/2/users/:id/liked_tweets`
-- Store Tweet ID, text, link, author, date
-
-### 2. Substack Fetcher
-- Input: list of RSS URLs in config
-- Fetch latest posts
-- Extract title, link, summary, date
-
-### 3. LinkedIn Saver (Manual)
-- Load from `linkedin_saves.json` or paste into UI
-- OR use a Chrome extension to capture current URL + title
+| Feature                   | Description                                              |
+| ------------------------- | -------------------------------------------------------- |
+| 🐦 X.com Integration      | Fetch latest liked posts via API                         |
+| 📬 Substack Integration   | Parse RSS feeds for latest posts                         |
+| 💼 LinkedIn Manual Import | Load `linkedin_saves.json` file with saved post metadata |
+| 🗂️ Unified View          | Display posts in a consistent, scrollable layout         |
+| 🏷️ Tagging & Annotation  | Allow users to add/edit tags and notes                   |
+| 🔍 Search                 | Filter posts by keywords and tags                        |
+| 💾 Local Persistence      | Save tags/notes to a file or lightweight DB              |
+| 🔁 Refresh Button         | Pull new content from X and Substack on demand           |
 
 ---
 
-## 🧪 Task Checklist
+## 🧱 Data Model
 
-- [ ] Add config file for tokens, feeds, and LinkedIn data
-- [ ] Twitter likes fetch + store
-- [ ] Substack RSS fetch + store
-- [ ] JSON loader for LinkedIn links (manual)
-- [ ] UI to view, tag, annotate, and search posts
-- [ ] Export to `.md` or `.json` by tag/date (optional)
+### Unified Post Schema
 
----
+```json
+{
+  "id": "string",
+  "platform": "x|substack|linkedin",
+  "title": "string",
+  "author": "string",
+  "url": "string",
+  "summary": "string",
+  "tags": ["string"],
+  "note": "string",
+  "saved_at": "YYYY-MM-DD"
+}
+```
 
-## 📅 Timeline
+### Persistence File
 
-| Task                         | Time Estimate |
-|------------------------------|---------------|
-| Twitter fetch setup          | 0.5 day       |
-| Substack RSS parsing         | 0.5 day       |
-| LinkedIn JSON/CSV loader     | 0.25 day      |
-| Local tagging + annotation UI| 1 day         |
-| Search UI                    | 0.25 day      |
-| Export & polish              | 0.25 day      |
-
-**Total: ~2.5 days**
+* `local_notes.json` stores tag and note overrides per `id`.
 
 ---
 
-## 🚫 Out of Scope
+## 🔌 Data Ingestion Logic
 
-- LinkedIn API integration (not available for saved posts)
-- Auth or multiple users
-- Chrome extension (future add-on)
+### 🐦 X.com
+
+* API: `GET /2/users/:id/liked_tweets`
+* Auth: Bearer Token (manually added to `.env`)
+* Fetched Fields:
+
+  * `id`, `text`, `author.username`, `created_at`, `url`
+
+### 📬 Substack
+
+* RSS URLs listed in config or `feeds.json`
+* Use Python `feedparser` to fetch:
+
+  * `title`, `summary`, `link`, `published`, `author`
+
+### 💼 LinkedIn
+
+* Manually create/import a file: `linkedin_saves.json`
+* Each entry should match unified schema
 
 ---
 
-## 💡 Future Scope (Post-MVP)
+## 🖼 UI Requirements
 
-- Chrome extension to capture LinkedIn or X posts in real time
-- GPT-powered summarization or categorization
-- Cross-platform similarity detection (e.g., same post on X and Substack)
-- Full-text search engine (e.g., using SQLite FTS5 or Meilisearch)
+### Dashboard Page
+
+| Component          | Description                                         |
+| ------------------ | --------------------------------------------------- |
+| 🔍 Search Bar      | Filters posts by `title`, `summary`, `tags`, `note` |
+| 📋 Post Cards      | One card per post, expandable view                  |
+| 🏷️ Tag Editor     | Input chips or comma-separated text                 |
+| 📝 Note Editor     | Multi-line `text_area`                              |
+| 💾 Save Button     | Writes local tag/note edits to `local_notes.json`   |
+| 🔁 Refresh Buttons | Re-fetch X.com likes and Substack feeds             |
+
+### Card Display Example:
+
+```
+[Platform Badge] [Title as Link]
+by [Author] on [saved_at]
+
+Summary...
+
+Tags: [founder] [fundraising]
+Note: [Useful for CapTableGuru UI ideas]
+```
+
+---
+
+## 🛠 Tech Stack
+
+| Layer    | Tech                                          |
+| -------- | --------------------------------------------- |
+| Frontend | Streamlit                                     |
+| Backend  | Python scripts for API & RSS                  |
+| Storage  | JSON (local\_notes.json) or SQLite (optional) |
+| Env Vars | `.env` for tokens and feed list               |
+
+---
+
+## 🧪 Testing & Edge Cases
+
+| Case                            | Expected Behavior                 |
+| ------------------------------- | --------------------------------- |
+| Invalid RSS URL                 | Skip and log error                |
+| No internet                     | Display cached data only          |
+| Empty tag/note                  | Acceptable — save as empty string |
+| Duplicate post IDs              | Skip or override (warn in logs)   |
+| Twitter API rate limit exceeded | Show Streamlit warning message    |
+
+---
+
+## ⏱ Timeline (MVP Implementation)
+
+| Task                                    | Time Estimate |
+| --------------------------------------- | ------------- |
+| Set up `.env`, feed config, sample data | 0.25 day      |
+| Fetch X.com likes via API               | 0.25 day      |
+| Fetch Substack posts via RSS            | 0.25 day      |
+| Parse LinkedIn JSON                     | 0.25 day      |
+| Normalize + merge posts                 | 0.25 day      |
+| Build UI to view + search + tag         | 0.5 day       |
+| Add local save logic                    | 0.25 day      |
+| Test refresh + save behavior            | 0.25 day      |
+
+Total: **\~2 days**
+
+---
+
+## ⛔ Out of Scope (MVP)
+
+* OAuth login or user sessions
+* Real LinkedIn integration (no public API)
+* GPT tagging or summaries
+* Multi-user support
+* Markdown or Notion export
+
+---
+
+## 🔮 Future Enhancements
+
+* GPT summarization per post
+* Chrome extension to save LinkedIn content live
+* Tag suggestions or autocomplete
+* Export to Markdown, Notion, or CSV
+* Background job to auto-refresh content
+
+---
+
+Let me know if you want this PRD bundled with:
+
+* `env_template`, `feeds.json`, and `local_notes.json` templates
+* A `main.py` scaffold
+* GitHub issues autogenerated from this PRD
+
+Ready to ship 🚀
