@@ -1,38 +1,139 @@
-[
-  {
-    "epic": "Setup & Data Prep",
-    "user_story": "Initialize project folder and add sample JSON files",
-    "body": "- Create folder structure\n- Add `twitter.json`, `substack.json`, and `linkedin_saves.json`\n- Create empty `app.py` to start building",
-    "labels": ["epic:setup", "type:task"]
-  },
-  {
-    "epic": "Load + Normalize Data",
-    "user_story": "Load and normalize post data from all 3 platforms",
-    "body": "- Read data from JSON files\n- Standardize to format: `id`, `platform`, `title`, `summary`, `url`, `tags`, `note`, `saved_at`\n- Combine all into one list for rendering",
-    "labels": ["epic:data", "type:feature"]
-  },
-  {
-    "epic": "Post Display UI",
-    "user_story": "Build Streamlit UI to show saved posts with platform and title",
-    "body": "- Add `st.text_input` for search\n- Loop through posts and show in expandable cards\n- Show platform, title (linked), summary, tags, note",
-    "labels": ["epic:ui", "type:feature"]
-  },
-  {
-    "epic": "Tagging + Notes Editing",
-    "user_story": "Allow users to tag and annotate saved posts",
-    "body": "- Add input for custom tags per post\n- Add editable notes section\n- Store temporary edits in memory",
-    "labels": ["epic:ui", "type:feature"]
-  },
-  {
-    "epic": "Save & Export",
-    "user_story": "Save changes to JSON files and enable export",
-    "body": "- Group posts by platform\n- Overwrite `twitter.json`, `substack.json`, `linkedin_saves.json`\n- (Optional) Add Markdown export of all posts",
-    "labels": ["epic:data", "type:feature"]
-  },
-  {
-    "epic": "Final Testing",
-    "user_story": "Test app flow and ensure tag/note edits persist",
-    "body": "- Check that search and editing work correctly\n- Test saving and reopening JSONs\n- Validate behavior with 10+ posts",
-    "labels": ["epic:test", "type:qa"]
-  }
-]
+{
+  "epics": [
+    {
+      "epic": "Setup & Configuration",
+      "user_stories": [
+        {
+          "story": "As a developer, I want to set up the project environment and configs quickly so I can start building the app.",
+          "tasks": [
+            "Create project folder `post_collector/`",
+            "Add `.env` with `X_BEARER_TOKEN` and `X_USER_ID`",
+            "Create `feeds.json` with sample Substack RSS links",
+            "Create `linkedin_saves.json` with sample entries",
+            "Install required packages: streamlit, feedparser, requests, python-dotenv"
+          ]
+        }
+      ]
+    },
+    {
+      "epic": "Live Data Fetching & Normalization",
+      "user_stories": [
+        {
+          "story": "As a user, I want to fetch my liked posts from X.com using the API.",
+          "tasks": [
+            "Create `fetch_x_likes()` to call `/2/users/:id/liked_tweets`",
+            "Parse tweet ID, text, author, created_at, and URL",
+            "Normalize X posts to shared schema"
+          ]
+        },
+        {
+          "story": "As a user, I want to fetch new articles from Substack feeds using RSS.",
+          "tasks": [
+            "Create `fetch_substack_feeds()` using `feedparser`",
+            "Read RSS URLs from `feeds.json`",
+            "Extract title, summary, author, published date, and URL",
+            "Normalize Substack posts to shared schema"
+          ]
+        },
+        {
+          "story": "As a user, I want to import my LinkedIn saved posts from a local file.",
+          "tasks": [
+            "Read `linkedin_saves.json` from disk",
+            "Validate format matches schema",
+            "Add `platform: linkedin` to each item"
+          ]
+        },
+        {
+          "story": "As a developer, I want to merge all post sources into a unified data list.",
+          "tasks": [
+            "Normalize all sources into common schema",
+            "Combine all posts into a single list",
+            "Sort by saved date (descending)"
+          ]
+        }
+      ]
+    },
+    {
+      "epic": "Post Viewer UI",
+      "user_stories": [
+        {
+          "story": "As a user, I want to view all my saved posts in one scrollable interface.",
+          "tasks": [
+            "Create a Streamlit UI loop for all posts",
+            "Render each post in an `st.expander` or `card`",
+            "Display platform badge, title (clickable), summary, author, saved date"
+          ]
+        },
+        {
+          "story": "As a user, I want to search through my posts by keywords.",
+          "tasks": [
+            "Add `st.text_input` search bar at top",
+            "Filter posts by title, summary, note, or tags"
+          ]
+        }
+      ]
+    },
+    {
+      "epic": "Tagging & Note Editing",
+      "user_stories": [
+        {
+          "story": "As a user, I want to add personal tags to organize posts.",
+          "tasks": [
+            "Add `st.text_input` for tags per post",
+            "Pre-fill existing tags from local notes file",
+            "Store updated tags in memory"
+          ]
+        },
+        {
+          "story": "As a user, I want to write personal notes under each post.",
+          "tasks": [
+            "Add `st.text_area` for notes",
+            "Pre-fill existing notes from local file",
+            "Update memory on edit"
+          ]
+        }
+      ]
+    },
+    {
+      "epic": "Save & Load Notes",
+      "user_stories": [
+        {
+          "story": "As a user, I want to save my tags and notes locally for future sessions.",
+          "tasks": [
+            "Create `local_notes.json` if missing",
+            "On app load, load tag/note data into memory by post_id",
+            "Create `Save All Changes` button",
+            "On save: write updated tag/note map to `local_notes.json`"
+          ]
+        }
+      ]
+    },
+    {
+      "epic": "Content Refresh",
+      "user_stories": [
+        {
+          "story": "As a user, I want to manually refresh X.com and Substack content to get the latest saved posts.",
+          "tasks": [
+            "Add `Refresh Feeds` button",
+            "On click: re-run fetch functions",
+            "Reload UI with updated post list"
+          ]
+        }
+      ]
+    },
+    {
+      "epic": "Testing & Error Handling",
+      "user_stories": [
+        {
+          "story": "As a developer, I want the app to fail gracefully if an API or feed fails.",
+          "tasks": [
+            "Show warning if X.com API is rate-limited or fails",
+            "Show warning if RSS feed URL is invalid or empty",
+            "Show empty state message if no LinkedIn file",
+            "Catch errors when writing to `local_notes.json`"
+          ]
+        }
+      ]
+    }
+  ]
+}
